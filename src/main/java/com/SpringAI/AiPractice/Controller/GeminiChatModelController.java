@@ -6,9 +6,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class TestController {
+public class GeminiChatModelController {
     private GoogleGenAiChatModel chatModel;
-    public TestController(GoogleGenAiChatModel chatModel){
+
+    //Constructor Injection will create the Object by itself using spring
+    public GeminiChatModelController(GoogleGenAiChatModel chatModel){
         this.chatModel=chatModel;
     }
     @GetMapping("/simplemessage/{message}")
