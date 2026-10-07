@@ -1,0 +1,22 @@
+# OS
+.DS_Store
+
+# Secrets
+.env
+*.env
+
+# Java / Maven
+target/
+*.class
+
+# IDE
+.idea/
+*.iml
+
+# Node / Vite
+node_modules/
+dist/
+.vite/
+
+# Logs
+*.log
