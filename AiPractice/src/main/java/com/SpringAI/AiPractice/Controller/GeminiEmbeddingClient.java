@@ -50,4 +50,68 @@ public class GeminiEmbeddingClient {
         }
         return result;
     }
+    @PostMapping("/api/embedding/similarity")
+    public double getSimilarity(@RequestParam String text1, @RequestParam String text2){
+
+        // Get Embeddings array of both the text
+
+        Content content1 = Content.builder()
+                .parts(Collections.singletonList(
+                        Part.builder().text(text1).build()
+                ))
+                .build();
+
+        Content content2 = Content.builder()
+                .parts(Collections.singletonList(
+                        Part.builder().text(text2).build()
+                ))
+                .build();
+        // Configure the shortened dimensionality (e.g., 512 dimensions)
+        EmbedContentConfig config = EmbedContentConfig.builder()
+                .outputDimensionality(512)
+                .build();
+
+        // Call the Gemini API
+        EmbedContentResponse response1 = client.models.embedContent(
+                "gemini-embedding-2",
+                content1,
+                config
+        );
+
+        EmbedContentResponse response2 = client.models.embedContent(
+                "gemini-embedding-2",
+                content2,
+                config
+        );
+
+        // Get result embeddings array
+        ContentEmbedding embedding1 = response1.embeddings().orElseThrow().get(0);
+        List<Float> values1 = embedding1.values().orElseThrow();
+        float[] result1 = new float[values1.size()];
+        for (int i = 0; i < values1.size(); i++) {
+            result1[i] = values1.get(i);
+        }
+
+        ContentEmbedding embedding2 = response2.embeddings().orElseThrow().get(0);
+        List<Float> values2 = embedding2.values().orElseThrow();
+        float[] result2 = new float[values2.size()];
+        for (int i = 0; i < values2.size(); i++) {
+            result2[i] = values2.get(i);
+        }
+
+        // We need to use formula here ourself as java does no give inbuilt formula for this like numpy in python
+        double dotProduct=0;
+        double norm1=0;
+        double norm2=0;
+
+        for(int i=0;i<result1.length;i++){
+            dotProduct+=result1[i]*result2[i];
+            norm1+=Math.pow(result1[i],2);
+            norm2+=Math.pow(result2[i],2);
+        }
+        double value= dotProduct/(Math.sqrt(norm1)*Math.sqrt(norm2));
+
+        //percentage of similarity
+        return value*100;
+    }
 }
